@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Foundation;
 
 namespace UnitedCodebase.Classes
@@ -27,6 +23,8 @@ namespace UnitedCodebase.Classes
             {
                 action.Close();
                 action = null;
+
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
                 GC.Collect(1, GCCollectionMode.Forced);
             }
         }
@@ -38,6 +36,8 @@ namespace UnitedCodebase.Classes
             {
                 action.Close();
                 action = null;
+
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
                 GC.Collect(1, GCCollectionMode.Forced);
             }
         }

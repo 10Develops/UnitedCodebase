@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
+using Windows.Data.Xml.Dom;
 using Windows.Foundation.Metadata;
+using Windows.UI.Notifications;
 using Windows.UI.Shell;
 using Windows.UI.StartScreen;
 
@@ -104,15 +106,20 @@ namespace UnitedCodebase.Classes
             return result;
         }
 
-        public async static Task<bool> RequestPinSecondaryTile(string tileName, string displayname)
+        public async static Task<bool> RequestPinSecondaryTile(string tileName, string displayname, Uri imageUri = null)
         {
+            if(imageUri == null)
+            {
+                imageUri = new Uri("ms-appx:///Assets/Square150x150Logo.scale-100.png");
+            }
+
             if (!SecondaryTile.Exists(tileName))
             {
                 SecondaryTile tile = new SecondaryTile(
                     SanitizedTileName(displayname).Replace("!",""),
                     displayname,
                     SanitizedTileName(tileName),
-                    new Uri("ms-appx:///Assets/Square150x150Logo.scale-100.png"),
+                    imageUri,
                     TileSize.Default);
                 tile.VisualElements.ShowNameOnSquare150x150Logo = true;
                 return await tile.RequestCreateAsync();
@@ -149,9 +156,11 @@ namespace UnitedCodebase.Classes
                 {
                     if (!SecondaryTile.Exists(tileName))
                     {
-                        SecondaryTile tile = new SecondaryTile(SanitizedTileName(displayname).Replace("!", ""));
-                        tile.DisplayName = displayname;
-                        tile.Arguments = SanitizedTileName(tileName);
+                        SecondaryTile tile = new SecondaryTile(SanitizedTileName(displayname).Replace("!", ""))
+                        {
+                            DisplayName = displayname,
+                            Arguments = SanitizedTileName(tileName)
+                        };
                         tile.VisualElements.Square44x44Logo = new Uri("ms-appx:///Assets/Square44x44Logo.scale-100.png");
                         tile.VisualElements.Square150x150Logo = new Uri("ms-appx:///Assets/Square150x150Logo.scale-100.png");
                         tile.VisualElements.ShowNameOnSquare150x150Logo = true;
@@ -168,5 +177,59 @@ namespace UnitedCodebase.Classes
             // TODO: complete if necessary...
             return tileName.Replace(" ", "_");
         }
+
+        #region "Tile Badge"
+
+        public static void SetBadgeNumber(int num)
+        {
+
+            // Get the blank badge XML payload for a badge number
+            XmlDocument badgeXml =
+                BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
+
+            // Set the value of the badge in the XML to our number
+            XmlElement badgeElement = badgeXml.SelectSingleNode("/badge") as XmlElement;
+            badgeElement.SetAttribute("value", num.ToString());
+
+            // Create the badge notification
+            BadgeNotification badge = new BadgeNotification(badgeXml);
+
+            // Create the badge updater for the application
+            BadgeUpdater badgeUpdater =
+                BadgeUpdateManager.CreateBadgeUpdaterForApplication();
+
+            // And update the badge
+            badgeUpdater.Update(badge);
+
+        }
+
+        public static void SetBadgeGlyph(string glyph)
+        {
+            // Get the blank badge XML payload for a badge glyph
+            XmlDocument badgeXml =
+                BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeGlyph);
+
+            // Set the value of the badge in the XML to our glyph value
+            XmlElement badgeElement =
+                badgeXml.SelectSingleNode("/badge") as XmlElement;
+            badgeElement.SetAttribute("value", glyph);
+
+            // Create the badge notification
+            BadgeNotification badge = new BadgeNotification(badgeXml);
+
+            // Create the badge updater for the application
+            BadgeUpdater badgeUpdater =
+                BadgeUpdateManager.CreateBadgeUpdaterForApplication();
+
+            // And update the badge
+            badgeUpdater.Update(badge);
+
+        }
+
+        public static void ClearBadge()
+        {
+            BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear();
+        }
+        #endregion
     }
 }

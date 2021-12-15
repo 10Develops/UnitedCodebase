@@ -1,16 +1,15 @@
 ﻿using Windows.UI;
 using Windows.UI.Composition;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Hosting;
 using Microsoft.Graphics.Canvas.Effects;
 using Windows.UI.Xaml.Media;
 using System;
 using Microsoft.Graphics.Canvas;
-using System.Diagnostics;
 using Windows.UI.Core;
 using Windows.System.Power;
 using Windows.UI.ViewManagement;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
 
 namespace UnitedCodebase.Brushes
 {
@@ -23,6 +22,8 @@ namespace UnitedCodebase.Brushes
         public CompositionEffectBrush effectBrush;
         Compositor compositor = Window.Current.Compositor;
         CompositionBackdropBrush backdropBrush;
+
+        UISettings DefaultTheme = new UISettings();
 
         static float sc_blurRadius = 30.0f;
         static float sc_noiseOpacity = 0.02f;
@@ -71,18 +72,33 @@ namespace UnitedCodebase.Brushes
 
         }
 
+        public double TintOpacity
+        {
+            get { return (double)GetValue(TintOpacityProperty); }
+            set { SetValue(TintOpacityProperty, value); }
+        }
+
+        public static readonly DependencyProperty TintOpacityProperty = DependencyProperty.Register(
+            nameof(TintOpacity), typeof(double), typeof(UCAcrylicBrush), new PropertyMetadata(default(double), OnTintOpacityChanged));
+
+        private static void OnTintOpacityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+
+        }
+
         private void ConnectAcrylicBrush(bool useFallback)
         {
             DisconnectAcryilicBrush();
 
             bool isWindowed = BackgroundSource == CustomAcrylicBackgroundSource.Hostbackdrop;
-            if (useFallback == false && PowerManager.EnergySaverStatus != EnergySaverStatus.On && !(UIViewSettings.GetForCurrentView().UserInteractionMode == UserInteractionMode.Touch && isWindowed))
+            if (useFallback == false && PowerManager.EnergySaverStatus != EnergySaverStatus.On && DefaultTheme.AdvancedEffectsEnabled
+                && !(UIViewSettings.GetForCurrentView().UserInteractionMode == UserInteractionMode.Touch && isWindowed))
             {
                 ArithmeticCompositeEffect crossFadeEffect = new ArithmeticCompositeEffect
                 {
                     MultiplyAmount = 0f,
-                    Source1Amount = 0.6f,
-                    Source2Amount = 0.4f,
+                    Source1Amount = (float)TintOpacity,
+                    Source2Amount = 1 - (float)TintOpacity,
                     Source1 = new ColorSourceEffect
                     {
                         Color = TintColor
@@ -170,14 +186,51 @@ namespace UnitedCodebase.Brushes
             CoreWindow.GetForCurrentThread().VisibilityChanged += UCAcrylicBrush_VisibilityChanged;
         }
 
+        private void UCAcrylicBrush_Activated(CoreWindow sender, WindowActivatedEventArgs args)
+        {
+            ConnectAcrylicBrush(args.WindowActivationState == CoreWindowActivationState.Deactivated);
+            if (args.WindowActivationState != CoreWindowActivationState.Deactivated)
+            {
+                PowerManager.EnergySaverStatusChanged += PowerManager_EnergySaverStatusChanged;
+                DefaultTheme.AdvancedEffectsEnabledChanged += DefaultTheme_AdvancedEffectsEnabledChanged;
+            }
+            else
+            {
+                PowerManager.EnergySaverStatusChanged -= PowerManager_EnergySaverStatusChanged;
+                DefaultTheme.AdvancedEffectsEnabledChanged -= DefaultTheme_AdvancedEffectsEnabledChanged;
+            }
+
+            
+        }
+        private async void DefaultTheme_AdvancedEffectsEnabledChanged(UISettings sender, object args)
+        {
+            var window = CoreWindow.GetForCurrentThread();
+            await Task.Run(async () =>
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    DisconnectAcryilicBrush();
+                    ConnectAcrylicBrush(PowerManager.EnergySaverStatus == EnergySaverStatus.On);
+                });
+            });
+        }
+
         private void UCAcrylicBrush_VisibilityChanged(CoreWindow sender, VisibilityChangedEventArgs args)
         {
             ConnectAcrylicBrush(!args.Visible);
         }
 
-        private void UCAcrylicBrush_Activated(CoreWindow sender, WindowActivatedEventArgs args)
+        private async void PowerManager_EnergySaverStatusChanged(object sender, object e)
         {
-            ConnectAcrylicBrush(args.WindowActivationState == CoreWindowActivationState.Deactivated);
+            var window = CoreWindow.GetForCurrentThread();
+            await Task.Run(async () =>
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    DisconnectAcryilicBrush();
+                    ConnectAcrylicBrush(PowerManager.EnergySaverStatus == EnergySaverStatus.On);
+                });
+            });
         }
 
         private void DisconnectAcryilicBrush()

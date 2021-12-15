@@ -12,8 +12,7 @@ namespace UnitedCodebase.Classes
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            var layoutRoot = GetTemplateChild("LayoutRoot") as Grid;
-            if (layoutRoot != null)
+            if (GetTemplateChild("LayoutRoot") is Grid layoutRoot)
             {
                 VisualStateManager.SetCustomVisualStateManager(layoutRoot, new UCCommandBarVisualStateManager());
             }

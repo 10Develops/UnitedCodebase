@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Windows.ApplicationModel;
 using Windows.Security.ExchangeActiveSyncProvisioning;
@@ -279,27 +275,9 @@ namespace UnitedCodebase.Classes
 
         private static Dictionary<string, string> nokiaLookupTable = new Dictionary<string, string>()
         {
-            // Lumia 505
-            { "LUMIA 505", "Lumia 505" },
-            // Lumia 510
-            { "LUMIA 510", "Lumia 510" },
-            { "NOKIA 510", "Lumia 510" },
-            // Lumia 610
-            { "LUMIA 610", "Lumia 610" },
-            { "LUMIA 610 NFC", "Lumia 610 NFC" },
-            { "NOKIA 610", "Lumia 610" },
-            { "NOKIA 610C", "Lumia 610" },
             // Lumia 620
             { "LUMIA 620", "Lumia 620" },
             { "RM-846", "Lumia 620" },
-            // Lumia 710
-            { "LUMIA 710", "Lumia 710" },
-            { "NOKIA 710", "Lumia 710" },
-            // Lumia 800
-            { "LUMIA 800", "Lumia 800" },
-            { "LUMIA 800C", "Lumia 800" },
-            { "NOKIA 800", "Lumia 800" },
-            { "NOKIA 800C", "Lumia 800" },
             // Lumia 810
             { "RM-878", "Lumia 810" },
             // Lumia 820
@@ -308,9 +286,6 @@ namespace UnitedCodebase.Classes
             { "RM-826", "Lumia 820" },
             // Lumia 822
             { "RM-845", "Lumia 822" },
-            // Lumia 900
-            { "LUMIA 900", "Lumia 900" },
-            { "NOKIA 900", "Lumia 900" },
             // Lumia 920
             { "RM-820", "Lumia 920" },
             { "RM-821", "Lumia 920" },
@@ -427,8 +402,8 @@ namespace UnitedCodebase.Classes
             // Lumia 430 
             { "RM-1099", "Lumia 430 Dual SIM" },
             // Lumia 950
-            { "RM-1104", "Lumia 950 Dual SIM" },
-            { "RM-1105", "Lumia 950 Dual SIM" },
+            { "RM-1104", "Lumia 950" },
+            { "RM-1105", "Lumia 950" },
             { "RM-1118", "Lumia 950 Dual SIM" },
             // Lumia 950 XL
             { "RM-1085", "Lumia 950 XL" },

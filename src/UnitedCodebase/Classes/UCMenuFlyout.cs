@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Foundation.Metadata;
+﻿using Windows.Foundation.Metadata;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
 
 namespace UnitedCodebase.Classes
 {
@@ -72,11 +65,26 @@ namespace UnitedCodebase.Classes
                     ((RichEditBox)Target).Focus(FocusState.Keyboard);
                 }
 
+                if (Target is WebView)
+                {
+                    ((WebView)Target).Focus(FocusState.Keyboard);
+                }
+
                 if (Target is TextBox)
                 {
                     ((TextBox)Target).PreventKeyboardDisplayOnProgrammaticFocus = false;
 
                     ((TextBox)Target).Focus(FocusState.Keyboard);
+                }
+
+                if (Target is AutoSuggestBox)
+                {
+                    ((AutoSuggestBox)Target).Focus(FocusState.Keyboard);
+                }
+
+                if (Target is TextBlock)
+                {
+                    ((AutoSuggestBox)Target).Focus(FocusState.Keyboard);
                 }
             }
         }

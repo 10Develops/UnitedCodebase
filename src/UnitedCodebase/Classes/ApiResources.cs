@@ -1,17 +1,12 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Foundation.Metadata;
 using Windows.Phone.Devices.Notification;
 using Windows.Storage;
 using Windows.System;
+using Windows.UI.Core;
 using Windows.UI.Input.Preview.Injection;
-using Windows.UI.Notifications;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
 
@@ -42,7 +37,7 @@ namespace UnitedCodebase.Classes
             {
             }
 
-            header = "Mozilla/5.0 (Windows Phone 10.0;) Edge/12.10166";
+            header = "Mozilla/5.0 (Windows Phone 10.0;) Edge/12.10240";
 
 
             //Send the GET request asynchronously and retrieve the response as a string.
@@ -140,6 +135,40 @@ namespace UnitedCodebase.Classes
         }
         #endregion
 
+        #region "Content Dialogs"
+        public static async void ShowPopUpDialogAsync(string title, object content, bool twobutton = false, bool prompt = false)
+        {
+            ContentDialog PopUpDialog = new ContentDialog()
+            {
+                PrimaryButtonText = "OK"
+            };
+
+            if (twobutton)
+            {
+                PopUpDialog.SecondaryButtonText = "Cancel";
+            }
+
+            PopUpDialog.Title = title;
+
+            PopUpDialog.Content = content;
+
+            if (prompt)
+            {
+                ContentControl contentControl = new ContentControl
+                {
+                    Content = content
+                };
+                StackPanel ContentStackPanel = new StackPanel();
+                ContentStackPanel.Children.Add(contentControl);
+                ContentStackPanel.Children.Add(new TextBox() { });
+                PopUpDialog.Content = ContentStackPanel;
+            }
+
+            await PopUpDialog
+                .ShowAsync();
+        }
+        #endregion
+
         public static void Vibrate(double timeMilliseconds)
         {
             string VibrateBool = localSettings.Values["vibrate"].ToString();
@@ -154,8 +183,10 @@ namespace UnitedCodebase.Classes
         private void InvokeKey(VirtualKey key)
         {
             InputInjector inputInjector = InputInjector.TryCreate();
-            var info = new InjectedInputKeyboardInfo();
-            info.VirtualKey = (ushort)(VirtualKey)key;
+            var info = new InjectedInputKeyboardInfo
+            {
+                VirtualKey = (ushort)(VirtualKey)key
+            };
             inputInjector.InjectKeyboardInput(new[] { info });
         }
 
@@ -228,6 +259,14 @@ namespace UnitedCodebase.Classes
             }
 
             return uniqueStr;
+        }
+
+        public static CoreWindow CurrentView
+        {
+            get
+            {
+                return CoreWindow.GetForCurrentThread();
+            }
         }
     }
 }

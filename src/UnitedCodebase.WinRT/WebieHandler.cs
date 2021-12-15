@@ -1,63 +1,89 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
 using Windows.Foundation.Metadata;
-using Windows.UI.Core;
-using Windows.UI.Xaml.Input;
 
 namespace UnitedCodebase.WinRT
 {
-    public delegate void NotifyAppHandler(string e);
+    public delegate void ReceivedDataHandler(string d);
     public delegate void ShowContextMenuEventHandler(int x, int y);
+    public delegate void ShowSelectionMenuEventHandler(int x, int y);
 
     [AllowForWeb]
     public sealed class WebieHandler
     {
-        public event NotifyAppHandler NotifyAppEvent;
+        public event ReceivedDataHandler ReceivedData;
+        public event ShowContextMenuEventHandler ContextMenuOpening;
+        public event ShowSelectionMenuEventHandler SelectionMenuOpening;
 
-        public event ShowContextMenuEventHandler ShowContextMenuEvent;
-
-        public async void sendData(string keyPress)
+        public async void sendData(string data)
         {
-            var window = CoreWindow.GetForCurrentThread();
-            await Task.Run(async () =>
+            Task sendData = Task.Run(() =>
             {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => 
-                {
-                    OnNotifyApp(keyPress);
-                });
+                OnReceivedData(data);
             });
+
+            await sendData;
+
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+        }
+
+        private void OnReceivedData(string args)
+        {
+            ReceivedDataHandler completedEvent = ReceivedData;
+            if (completedEvent != null)
+            {
+                completedEvent(args);
+                GC.Collect(0, GCCollectionMode.Forced);
+                GC.Collect(1, GCCollectionMode.Forced);
+                GC.Collect(2, GCCollectionMode.Forced);
+            }
         }
 
         public async void showContextMenu(int x, int y)
         {
-            var window = CoreWindow.GetForCurrentThread();
-            await Task.Run(async () =>
+            Task showContextMenu = Task.Run(() =>
             {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-                    OnShowContextMenu(x, y);
-                });
+                OnShowContextMenu(x, y);
             });
+
+            await showContextMenu;
+
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
         }
 
         private void OnShowContextMenu(int x, int y)
         {
-            var completedEvent = ShowContextMenuEvent;
+            ShowContextMenuEventHandler completedEvent = ContextMenuOpening;
             if (completedEvent != null)
             {
                 completedEvent(x, y);
+                GC.Collect(0, GCCollectionMode.Forced);
                 GC.Collect(1, GCCollectionMode.Forced);
+                GC.Collect(2, GCCollectionMode.Forced);
             }
         }
 
-        private void OnNotifyApp(string args)
+        public async void showSelectionMenu(int x, int y)
         {
-            var completedEvent = NotifyAppEvent;
+            Task showSelectionMenu = Task.Run(() =>
+            {
+                OnShowSelectionMenu(x, y);
+            });
+
+            await showSelectionMenu;
+
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+        }
+
+        private void OnShowSelectionMenu(int x, int y)
+        {
+            ShowSelectionMenuEventHandler completedEvent = SelectionMenuOpening;
             if (completedEvent != null)
             {
-                completedEvent(args);
+                completedEvent(x, y);
+                GC.Collect(0, GCCollectionMode.Forced);
                 GC.Collect(1, GCCollectionMode.Forced);
+                GC.Collect(2, GCCollectionMode.Forced);
             }
         }
     }
