@@ -84,7 +84,7 @@ namespace UnitedCodebase.Classes
 
                 if (Target is TextBlock)
                 {
-                    ((AutoSuggestBox)Target).Focus(FocusState.Keyboard);
+                    ((TextBlock)Target).Focus(FocusState.Keyboard);
                 }
             }
         }
