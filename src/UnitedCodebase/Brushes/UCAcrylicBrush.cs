@@ -13,7 +13,7 @@ using Windows.ApplicationModel.Core;
 
 namespace UnitedCodebase.Brushes
 {
-    /// <summary>
+    /// <summary>bb
     /// A lightweight control to add blur and tint effect.
     /// </summary>
     /// <seealso cref="Windows.UI.Xaml.Controls.Control" />

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Windows.Foundation;
 
 namespace UnitedCodebase.Classes
@@ -18,28 +17,36 @@ namespace UnitedCodebase.Classes
 
         public static async void Execute(IAsyncAction action)
         {
-            await action;
-            if (action.Status == AsyncStatus.Completed)
+            try
             {
-                action.Close();
-                action = null;
+                await action;
+                if (action.Status == AsyncStatus.Completed)
+                {
+                    action.Close();
+                    action = null;
 
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-                GC.Collect(1, GCCollectionMode.Forced);
+                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+                    GC.Collect(1, GCCollectionMode.Forced);
+                }
             }
+            catch (Exception) { }
         }
 
         public static async void ExecuteString(IAsyncOperation<string> action)
         {
-            _result = await action;
-            if (action.Status == AsyncStatus.Completed)
+            try
             {
-                action.Close();
-                action = null;
+                _result = await action;
+                if (action.Status == AsyncStatus.Completed)
+                {
+                    action.Close();
+                    action = null;
 
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-                GC.Collect(1, GCCollectionMode.Forced);
+                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+                    GC.Collect(1, GCCollectionMode.Forced);
+                }
             }
+            catch (Exception) { }
         }
     }
 }
