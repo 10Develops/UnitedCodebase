@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>UnitedCodebase</id>
-    <version>0.9.0.23</version>
+    <version>0.9.0.26</version>
     <title>UnitedCodebase</title>
     <description>UnitedCodebase project release edition</description>
     <authors>10Develops</authors>
@@ -15,7 +15,7 @@
         <dependency id="System.Runtime.WindowsRuntime" version="4.0.10" />
         <dependency id="System.Threading.Tasks" version="4.0.10" />
         <dependency id="Microsoft.Toolkit.Uwp.Notifications" version="4.0.0" />
-        <dependency id="Win2D.uwp" version="1.25.0" />
+        <dependency id="Win2D.uwp" version="1.23.0" />
       </group>
     </dependencies>
   </metadata>
